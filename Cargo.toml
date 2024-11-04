@@ -1,0 +1,11 @@
+[package]
+name = "taptempo"
+version = "0.1.0"
+edition = "2021"
+authors = ["Guy Rutenberg <guyrutenberg@gmail.com>"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+crossterm = "0.28"
+clap = { version = "4.5", features = ["derive"] }
