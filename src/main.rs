@@ -16,13 +16,22 @@ struct Cli {
     #[arg(short, long, default_value_t = 5)]
     sample_size: usize,
 
-    /// Set the time in seconds to reset the compututation
+    /// Set the time in seconds to reset the computation
     #[arg(short, long, default_value_t = 5)]
     timeout: usize,
+
+    /// Precision of the BPM output
+    #[arg(short, long, default_value_t = 0)]
+    precision: usize,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
+
+    if args.sample_size == 0 {
+        eprintln!("Error: sample size must be positive.");
+        std::process::exit(1);
+    }
 
     setup_terminal(&mut io::stdout());
 
@@ -32,7 +41,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     while block_until_key_press() {
         if let Some(bpm) = tap_tempo.tap() {
-            println!("Current tempo: {:.0} BPM\r", bpm);
+            println!(
+                "Current tempo: {:.precision$} BPM\r",
+                bpm,
+                precision = args.precision
+            );
         }
     }
 
