@@ -9,3 +9,4 @@ authors = ["Guy Rutenberg <guyrutenberg@gmail.com>"]
 [dependencies]
 crossterm = "0.28"
 clap = { version = "4.5", features = ["derive"] }
+ratatui = "0.29"

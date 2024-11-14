@@ -7,7 +7,10 @@ use crossterm::{
 };
 use std::io;
 
+mod bar_graph_display;
 mod tap_tempo;
+
+use bar_graph_display::BarGraphDisplay;
 use tap_tempo::TapTempo;
 
 #[derive(Parser, Debug)]
@@ -24,6 +27,10 @@ struct Cli {
     /// Precision of the BPM output
     #[arg(short, long, default_value_t = 0)]
     precision: usize,
+
+    /// Display BPM as a moving bar graph
+    #[arg(long)]
+    bar_graph: bool,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -34,19 +41,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::process::exit(1);
     }
 
-    setup_terminal(&mut io::stdout());
-
-    println!("Tap any key to measure tempo. Press 'Esc' to exit.\r");
+    let mut stdout = io::stdout();
+    setup_terminal(&mut stdout);
+    let mut bar_graph = if args.bar_graph {
+        Some(BarGraphDisplay::new())
+    } else {
+        println!("Tap any key to measure tempo. Press 'Esc' to exit.\r");
+        None
+    };
 
     let mut tap_tempo = TapTempo::new(args.sample_size, args.timeout);
 
     while block_until_key_press() {
         if let Some(bpm) = tap_tempo.tap() {
-            println!(
-                "Current tempo: {:.precision$} BPM\r",
-                bpm,
-                precision = args.precision
-            );
+            if let Some(ref mut bar_graph) = bar_graph {
+                bar_graph.add_bpm(bpm);
+                bar_graph.display()?;
+            } else {
+                println!(
+                    "Current tempo: {:.precision$} BPM\r",
+                    bpm,
+                    precision = args.precision
+                );
+            }
         }
     }
 
@@ -89,6 +106,6 @@ fn setup_terminal(stdout: &mut io::Stdout) {
 }
 
 fn cleanup_terminal(stdout: &mut io::Stdout) {
-    terminal::disable_raw_mode().expect("Can't disable termnal raw mode");
+    terminal::disable_raw_mode().expect("Can't disable terminal raw mode");
     execute!(stdout, DisableMouseCapture).expect("Can't disable mouse capture");
 }

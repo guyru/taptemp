@@ -16,7 +16,9 @@ Usage: taptempo [OPTIONS]
 
 Options:
   -s, --sample-size <SAMPLE_SIZE>  Number of samples to take for tempo calculation [default: 5]
-  -t, --timeout <TIMEOUT>          Set the time in seconds to reset the compututation [default: 5]
+  -t, --timeout <TIMEOUT>          Set the time in seconds to reset the computation [default: 5]
+  -p, --precision <PRECISION>      Precision of the BPM output [default: 0]
+      --bar-graph                  Display BPM as a moving bar graph
   -h, --help                       Print help
   -V, --version                    Print version
 ```
